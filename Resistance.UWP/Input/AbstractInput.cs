@@ -95,6 +95,7 @@ namespace Resistance.Input
         private BitArray GetActualInput()
         {
             var scaleMatrix =  Matrix.CreateTranslation(-Game1.instance.GraphicsDevice.Viewport.X, -Game1.instance.GraphicsDevice.Viewport.Y, 0f)* Matrix.Invert(Game1.instance.ScaleMatrix);
+
             var touchPoints = Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetState().Select(x => Vector2.Transform(x.Position, scaleMatrix));
             var gamepad = Windows.Gaming.Input.Gamepad.Gamepads.FirstOrDefault()?.GetCurrentReading();
             var keyboard = Microsoft.Xna.Framework.Input.Keyboard.GetState();

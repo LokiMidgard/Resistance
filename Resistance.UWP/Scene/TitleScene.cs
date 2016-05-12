@@ -39,22 +39,24 @@ namespace Resistance.Scene
 
         public void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
-            if (TouchPanel.IsGestureAvailable)
+            var gamepad = Windows.Gaming.Input.Gamepad.Gamepads.FirstOrDefault()?.GetCurrentReading();
+            var keyboard = Microsoft.Xna.Framework.Input.Keyboard.GetState();
+            var gesture = TouchPanel.IsGestureAvailable ? TouchPanel.ReadGesture() : null as GestureSample?;
+
             {
-                var gesture = TouchPanel.ReadGesture();
 
 
-                // If the user tapped the screen, we check all buttons to see if they were tapped.
-                if (gesture.GestureType == GestureType.Tap)
+
+
+                if (gesture?.GestureType == GestureType.Tap
+                    || (gamepad?.Buttons ?? Windows.Gaming.Input.GamepadButtons.None) != Windows.Gaming.Input.GamepadButtons.None
+                    || keyboard.GetPressedKeys().Any())
                 {
                     if (this.tombstone != null)
                         Game1.instance.SwitchToScene(new GameScene(tombstone.Value));
-                    if (gesture.Position.X < 250)
-                        Game1.instance.SwitchToScene(new GameScene(GameScene.Dificulty.Easy));
-                    else if (gesture.Position.X > 550)
-                        Game1.instance.SwitchToScene(new GameScene(GameScene.Dificulty.Hard));
                     else
-                        Game1.instance.SwitchToScene(new GameScene(GameScene.Dificulty.Medium));
+                        Game1.instance.SwitchToScene(new GameScene(GameScene.Dificulty.Easy));
+
 
                 }
             }
