@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration
+ xmlns="http://resistance.res"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://resistance.res ConfigurationSchema.xsd">
+  <World width="4000" height="800">
+    <EnemyShotSpeed>48</EnemyShotSpeed>
+  </World>
+  <Player>
+    <MaxLifePoints>5</MaxLifePoints>
+    <Speed>64</Speed>
+    <ShootSpeed>84</ShootSpeed>
+    <ShootCount>10</ShootCount>
+    <MaxBombSize>
+      <X>500</X>
+      <Y>500</Y>
+    </MaxBombSize>
+    <TimeToMaxDetonation>2</TimeToMaxDetonation>
+  </Player>
+  <Human numberFirstLevel="10" raisePerLevelMax="3" raisePerLevelMin="2"/>
+  <EnemyPredator numberFirstLevel="3" appearsInLevel="2" minAditionalPerLevel="3" maxAditionalPerLevel="4">
+    <Speed>16</Speed>
+    <Targeting>false</Targeting>
+  </EnemyPredator>
+  <EnemyCollector numberFirstLevel="5" appearsInLevel="1" maxAditionalPerLevel="3" minAditionalPerLevel="2">
+    <Speed>16</Speed>
+  </EnemyCollector>
+  <EnemyMine numberFirstLevel="0" appearsInLevel="3" minAditionalPerLevel="2" maxAditionalPerLevel="4">
+    <Speed>82</Speed>
+  </EnemyMine>
+  <EnemyDestroyer appearsInLevel="4" minTimeBetweenAppereance="10" probabilityPerSeccond="0.001" raiseProbabilityPerLevel="0.001">
+    <Speed>200</Speed>
+    <DamageCapathyty>4</DamageCapathyty>
+  </EnemyDestroyer>
+</Configuration>

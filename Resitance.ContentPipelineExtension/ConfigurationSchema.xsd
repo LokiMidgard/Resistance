@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ConfigurationSchema"
+    targetNamespace="http://tempuri.org/ConfigurationSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/ConfigurationSchema.xsd"
+    xmlns:mstns="http://tempuri.org/ConfigurationSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="Configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="World" type="World"/>
+        <xs:element name ="Player" type="Player"/>
+        <xs:element name ="EnemyPredator" type ="EnemyPredator"/>
+        <xs:element name ="EnemyCollector" type="Enemy"/>
+        <xs:element name ="EnemyMine" type="Enemy"/>
+        <xs:element name ="EnemyDestroyer" type="EnemyDestroyer"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="World">
+    <xs:sequence>
+      <xs:element name ="EnemyShotSpeed" type="xs:float" minOccurs ="1" maxOccurs ="1"/>
+    </xs:sequence>
+    <xs:attribute name ="width" type ="xs:int" use="required"/>
+    <xs:attribute name ="height" type ="xs:int" use="required"/>
+
+  </xs:complexType>
+  <xs:complexType name ="Player">
+    <xs:sequence>
+      <xs:element   name="MaxLifePoints"  type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element   name="Speed" type="xs:float" minOccurs="1" maxOccurs="1"/>
+      <xs:element   name="MaxBombSize" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="X" type="xs:int" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Y" type="xs:int" minOccurs="1" maxOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element   name="TimeToMaxDetonation"  type="xs:float" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name ="Enemy">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="numberFirstLevel" type ="xs:int" use ="required"/>
+    <xs:attribute name="minAditionalPerLevel" type ="xs:int" use ="required"/>
+    <xs:attribute name="maxAditionalPerLevel" type ="xs:int" use ="required"/>
+  </xs:complexType>
+  <xs:complexType name ="EnemyDestroyer">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name ="EnemyPredator">
+    <xs:sequence>
+      <xs:element name="Speed" type="xs:int"/>
+      <xs:element name="Targeting" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
