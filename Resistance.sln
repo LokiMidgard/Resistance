@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resistance.UWP", "Resistance.UWP\Resistance.UWP.csproj", "{3FBF8176-14AA-4133-B6FF-6212274F2CA3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D489CDB1-DE5F-4C49-8508-406D2F1128C6} = {D489CDB1-DE5F-4C49-8508-406D2F1128C6}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resitance.ContentPipelineExtension", "Resitance.ContentPipelineExtension\Resitance.ContentPipelineExtension.csproj", "{D489CDB1-DE5F-4C49-8508-406D2F1128C6}"
 EndProject

@@ -10,7 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\Resitance.ContentPipelineExtension\bin\Debug\Resitance.ContentPipelineExtension.dll
+/reference:..\Resitance.ContentPipelineExtension\bin\Release\Resitance.ContentPipelineExtension.dll
 
 #---------------------------------- Content ---------------------------------#
 

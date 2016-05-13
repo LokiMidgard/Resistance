@@ -88,6 +88,8 @@ namespace Resistance.Sprite
 
         public City(CityNumber image, float paralaxSpeed, GameScene scene)
         {
+            if (paralaxSpeed <= 0f)
+                throw new ArgumentException("Must be greater than 0", nameof(paralaxSpeed));
             this.image = CityNumber.None;
             this.ParalxSpeed = paralaxSpeed;
             this.scene = scene;
@@ -95,7 +97,10 @@ namespace Resistance.Sprite
             higherCity = new City(image, scene);
             Scalewidth = ((ParalxSpeed * (float)GameScene.VIEWPORT_WIDTH + scene.configuration.WorldWidth * 0.35f));
 
-            OriginalPosition = new Vector2(Game1.random.Next((int)(scene.configuration.WorldWidth - Scalewidth * 2)) + Scalewidth + GameScene.VIEWPORT_WIDTH, scene.configuration.WorldHeight - 10f - (1 - ParalxSpeed) * 10f);
+            var posiblePositions = (int)(scene.configuration.WorldWidth - Scalewidth * 2);
+            if (posiblePositions <= 0)
+                throw new Exception($"ShouldNotHeappen \n\tScalewidth: {Scalewidth}\n\tscene.configuration.WorldWidth:{scene.configuration.WorldWidth}\n\tParalxSpeed{ ParalxSpeed }");
+            OriginalPosition = new Vector2(Game1.random.Next(posiblePositions) + Scalewidth + GameScene.VIEWPORT_WIDTH, scene.configuration.WorldHeight - 10f - (1 - ParalxSpeed) * 10f);
             Visible = true;
             lowerCity.Visible = true;
             higherCity.Visible = true;
