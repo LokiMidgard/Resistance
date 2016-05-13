@@ -53,7 +53,8 @@ namespace Resistance.Sprite
 
             foreach (var item in scene.notDestroyedEnemys)
             {
-
+                if (item.Dead)
+                    continue; // While Exploding they are still in this collection :(
                 Vector2 v = item.Position * scalirungsvector;
                 radarDots[v + deltaVector] = Color.Violet;
             }
