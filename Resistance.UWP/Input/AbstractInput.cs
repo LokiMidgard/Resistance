@@ -9,7 +9,7 @@ using Resistance.Sprite;
 
 namespace Resistance.Input
 {
-    public abstract class AbstractInput : Components.IComponent, IDrawable
+    public class BaseInput : Components.IDrawableComponent
     {
         public class InputMapping
         {
@@ -46,7 +46,7 @@ namespace Resistance.Input
         }
 
 
-        public AbstractInput(params InputMapping[] recs)
+        public BaseInput(params InputMapping[] recs)
         {
             this.recs = recs;
             pressed = new BitArray(recs.Length);
@@ -94,7 +94,7 @@ namespace Resistance.Input
 
         private BitArray GetActualInput()
         {
-            var scaleMatrix =  Matrix.CreateTranslation(-Game1.instance.GraphicsDevice.Viewport.X, -Game1.instance.GraphicsDevice.Viewport.Y, 0f)* Matrix.Invert(Game1.instance.ScaleMatrix);
+            var scaleMatrix = Matrix.CreateTranslation(-Game1.instance.GraphicsDevice.Viewport.X, -Game1.instance.GraphicsDevice.Viewport.Y, 0f) * Matrix.Invert(Game1.instance.ScaleMatrix);
 
             var touchPoints = Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetState().Select(x => Vector2.Transform(x.Position, scaleMatrix));
             var gamepad = Windows.Gaming.Input.Gamepad.Gamepads.FirstOrDefault()?.GetCurrentReading();
@@ -112,7 +112,7 @@ namespace Resistance.Input
                 shouldbeVisible = false;
 
             if (shouldbeVisible.HasValue)
-                visible = shouldbeVisible.Value;
+                Visible = shouldbeVisible.Value;
 
             for (int i = 0; i < recs.Length; i++)
             {
@@ -143,42 +143,13 @@ namespace Resistance.Input
         }
 
 
-        private int drawOrder;
-        public int DrawOrder
-        {
-            get { return drawOrder; }
-            set
-            {
-                if (value != drawOrder)
-                {
-                    drawOrder = value;
-                    DrawOrderChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
 
-        public event EventHandler<EventArgs> DrawOrderChanged;
-
-        private bool visible = true;
-        public bool Visible
-        {
-            get { return visible; }
-            set
-            {
-                if (value != visible)
-                {
-                    visible = value;
-                    VisibleChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public event EventHandler<EventArgs> VisibleChanged;
+        public bool Visible { get; set; } = true;
 
         public void Draw(GameTime gameTime)
         {
             if (Visible)
-                for (int i = 0; i < recs.Length; i++)
+                for (int i = 0; i < buttons.Length; i++)
                 {
                     buttons[i].Draw(gameTime);
                 };

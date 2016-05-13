@@ -7,7 +7,7 @@ using Resistance.Sprite;
 
 namespace Resistance.Input
 {
-    public class GameInput : AbstractInput
+    public class GameInput : BaseInput
     {
 
 

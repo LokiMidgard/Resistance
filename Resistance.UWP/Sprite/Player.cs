@@ -108,32 +108,32 @@ namespace Resistance.Sprite
 
             movment = new Vector2();
 
-            if (input.Down == AbstractInput.Type.Hold)
+            if (input.Down == BaseInput.Type.Hold)
                 movment += new Vector2(0, 2);
-            if (input.Up == AbstractInput.Type.Hold)
+            if (input.Up == BaseInput.Type.Hold)
                 movment += new Vector2(0, -2);
             if (CurrentAnimation == FLY_RIGHT)
             {
                 movment += new Vector2(1, 0);
-                if (input.Right == AbstractInput.Type.Hold)
+                if (input.Right == BaseInput.Type.Hold)
                     movment += new Vector2(2, 0);
-                else if (input.Left == AbstractInput.Type.Press)
+                else if (input.Left == BaseInput.Type.Press)
                     CurrentAnimation = TURN_LEFT;
             }
             else if (CurrentAnimation == FLY_Left)
             {
                 movment += new Vector2(-1, 0);
-                if (input.Left == AbstractInput.Type.Hold)
+                if (input.Left == BaseInput.Type.Hold)
                     movment += new Vector2(-2, 0);
-                else if (input.Right == AbstractInput.Type.Press)
+                else if (input.Right == BaseInput.Type.Press)
                     CurrentAnimation = TURN_RIGHT;
             }
             movment *= Scene.configuration.Player.Speed;
-            if (input.Fire == AbstractInput.Type.Press && CurrentAnimation != TURN_LEFT && CurrentAnimation != TURN_RIGHT)
+            if (input.Fire == BaseInput.Type.Press && CurrentAnimation != TURN_LEFT && CurrentAnimation != TURN_RIGHT)
             {
                 Fire(movment.X);
             }
-            if (input.Bomb == AbstractInput.Type.Press && !bomb.Visible && CurrentAnimation != TURN_LEFT && CurrentAnimation != TURN_RIGHT)
+            if (input.Bomb == BaseInput.Type.Press && !bomb.Visible && CurrentAnimation != TURN_LEFT && CurrentAnimation != TURN_RIGHT)
             {
                 bomb.Boom();
             }
@@ -148,7 +148,7 @@ namespace Resistance.Sprite
 
         }
 
-        public class Bomb : Sprite
+        public class Bomb : Sprite<GameScene>
         {
 
             private Vector2 destructivRangeWithScaleOne;

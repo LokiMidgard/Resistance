@@ -126,7 +126,7 @@
     <Compile Include="Scene\LoadingScene.cs" />
     <Compile Include="Scene\TitleScene.cs" />
     <Compile Include="Sprite\AbstractEnemy.cs" />
-    <Compile Include="Sprite\AnimatedMenueEntry.cs" />
+    <Compile Include="Sprite\Animation.cs" />
     <Compile Include="Sprite\City.cs" />
     <Compile Include="Sprite\EnemyCollector.cs" />
     <Compile Include="Sprite\EnemyDestroyer.cs" />
@@ -134,6 +134,7 @@
     <Compile Include="Sprite\EnemyPredator.cs" />
     <Compile Include="Sprite\Hud.cs" />
     <Compile Include="Sprite\Humans.cs" />
+    <Compile Include="Sprite\ISprite.cs" />
     <Compile Include="Sprite\Player.cs" />
     <Compile Include="Sprite\RectButton.cs" />
     <Compile Include="Sprite\Sprite.cs" />
