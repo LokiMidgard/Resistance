@@ -249,12 +249,12 @@ namespace Resistance.Sprite
 
             static Shot()
             {
-                Shot.DIE_LEFT  = new Animation(new Point(0, 8), 4, 2, 160, 8, 0.05f, () => new Vector2(2, 4), loop: false);
+                Shot.DIE_LEFT = new Animation(new Point(0, 8), 4, 2, 160, 8, 0.05f, () => new Vector2(2, 4), loop: false);
                 Shot.DIE_RIGHT = new Animation(new Point(0, 8), 4, 2, 160, 8, 0.05f, () => new Vector2(158, 4), loop: false);
-                Shot.FLY_LEFT  = new Animation(new Point(0, 8), 1, 1, 160, 8, 0.05f, () => new Vector2(2, 4));
+                Shot.FLY_LEFT = new Animation(new Point(0, 8), 1, 1, 160, 8, 0.05f, () => new Vector2(2, 4));
                 Shot.FLY_RIGHT = new Animation(new Point(0, 8), 1, 1, 160, 8, 0.05f, () => new Vector2(158, 4));
-                Shot.CREATE_LEFT  = new Animation(Point.Zero, 4, 2,5, 160, 8, 0.05f, () => new Vector2(2, 4), Shot.FLY_LEFT);
-                Shot.CREATE_RIGHT = new Animation(Point.Zero, 4, 2, 5,160, 8, 0.05f, () => new Vector2(158, 4), Shot.FLY_RIGHT);
+                Shot.CREATE_LEFT = new Animation(Point.Zero, 4, 2, 5, 160, 8, 0.05f, () => new Vector2(2, 4), Shot.FLY_LEFT);
+                Shot.CREATE_RIGHT = new Animation(Point.Zero, 4, 2, 5, 160, 8, 0.05f, () => new Vector2(158, 4), Shot.FLY_RIGHT);
             }
 
             private static Microsoft.Xna.Framework.Graphics.Texture2D image;
@@ -279,7 +279,7 @@ namespace Resistance.Sprite
 
             private void Die()
             {
-                
+
                 switch (direction)
                 {
                     case Direction.Left:
@@ -300,21 +300,23 @@ namespace Resistance.Sprite
 
             public void Fire(float playerSpeed, Direction playerDirection, Vector2 position)
             {
-                this.Position = position;
                 this.direction = playerDirection;
                 switch (direction)
                 {
                     case Direction.Left:
                         speed = playerSpeed - SPEED;
+                        position.X -= 2f;
                         CurrentAnimation = CREATE_LEFT;
                         SpriteEfekt = SpriteEffects.FlipHorizontally;
                         break;
                     case Direction.Right:
                         speed = playerSpeed + SPEED;
+                        position.X += 2f;
                         CurrentAnimation = CREATE_RIGHT;
                         SpriteEfekt = SpriteEffects.None;
                         break;
                 }
+                this.Position = position;
                 Visible = true;
                 CurrentAnimationFrame = 0;
                 lifetime = 0;
