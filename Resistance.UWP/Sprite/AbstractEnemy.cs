@@ -10,26 +10,23 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Resistance.Sprite
 {
-    public abstract class AbstractEnemy : Sprite
+    public abstract class AbstractEnemy : CollidelbleSprite
     {
         public static Texture2D explosion;
         public static SoundEffect bam;
 
         private bool explosionLoaded = false;
 
-        public static readonly Animation EXPLOAD = new Animation(Point.Zero, 5, 4, 64, 64);
+        public static readonly Animation EXPLOAD = new Animation(Point.Zero, 5, 4, 64, 64, 0.1, () => new Vector2(23, 23));
 
-        public AbstractEnemy(String name, GameScene scene)
-            : base(name, scene)
-        {
-        }
+
         public bool Dead { get; set; }
 
         public override void Initilize()
         {
             base.Initilize();
             Dead = false;
-            position = new Vector2(Game1.random.Next(scene.configuration.WorldWidth), -30 - Game1.random.Next(100));
+            Position = new Vector2(Game1.random.Next(Scene.configuration.WorldWidth), -30 - Game1.random.Next(100));
             if (!explosionLoaded)
             {
                 Game1.instance.QueuLoadContent(@"Animation\ExplosionTiledsSmall", (Texture2D t) => explosion = t);
@@ -46,7 +43,7 @@ namespace Resistance.Sprite
                 var oldImage = Image;
                 Image = explosion;
 
-                base.Draw(gameTime);
+                base.Draw(gameTime); //TODO: Why do I revert this?
 
                 Image = oldImage;
             }
@@ -63,23 +60,27 @@ namespace Resistance.Sprite
             Dead = true;
 
             CurrentAnimation = EXPLOAD;
-            currentAnimationFrame = 0;
-            origion = new Vector2(23, 23);
-            position += new Vector2(-64 >> 2, -64 >> 2);
+            CurrentAnimationFrame = 0;
+            Position += new Vector2(-64 >> 2, -64 >> 2);
             bam.Play();
         }
 
 
+        private int lastExplosionFrame = -1;
+
+        public AbstractEnemy(string imageName, GameScene scene, Rectangle collisionRec) : base(imageName, scene, collisionRec)
+        {
+        }
 
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
+            base.Update(gameTime);
+
             if (Visible && CurrentAnimation == EXPLOAD)
             {
-                ++currentAnimationFrame;
-                if (currentAnimationFrame > CurrentAnimation.Length)
-                {
+                if (lastExplosionFrame > CurrentAnimationFrame)
                     Visible = false;
-                }
+                lastExplosionFrame = CurrentAnimationFrame;
             }
         }
     }

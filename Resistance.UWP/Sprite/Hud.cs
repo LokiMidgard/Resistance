@@ -43,7 +43,7 @@ namespace Resistance.Sprite
             Vector2 scalirungsvector = new Vector2((float)radarWidth / (float)scene.configuration.WorldWidth, (float)rardarHeight / (float)scene.configuration.WorldHeight);
             radarDots.Clear();
 
-            Vector2 playerVector = scene.player.position * scalirungsvector;
+            Vector2 playerVector = scene.player.Position * scalirungsvector;
 
             Vector2 mittelVector = new Vector2(this.radarWidth / 2, rardarHeight / 2);
 
@@ -54,24 +54,24 @@ namespace Resistance.Sprite
             foreach (var item in scene.notDestroyedEnemys)
             {
 
-                Vector2 v = item.position * scalirungsvector;
+                Vector2 v = item.Position * scalirungsvector;
                 radarDots[v + deltaVector] = Color.Violet;
             }
 
             foreach (var shot in from s in scene.allEnemyShots where s.Visible select s)
             {
-                radarDots[shot.position * scalirungsvector + deltaVector] = Color.WhiteSmoke;
+                radarDots[shot.Position * scalirungsvector + deltaVector] = Color.WhiteSmoke;
             }
 
             foreach (var item in scene.notKilledHumans)
             {
 
-                Vector2 v = item.position * scalirungsvector;
+                Vector2 v = item.Position * scalirungsvector;
                 radarDots[v + deltaVector] = item.IsCaptured ? Color.Red : Color.Green;
 
             }
 
-            Vector2 destroyserVector = scene.destroyer.position * scalirungsvector;
+            Vector2 destroyserVector = scene.destroyer.Position * scalirungsvector;
             radarDots[destroyserVector + deltaVector] = Color.Magenta;
 
 

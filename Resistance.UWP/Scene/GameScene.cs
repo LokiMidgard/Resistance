@@ -236,64 +236,64 @@ namespace Resistance.Scene
 
         private void MoveEveryThing()
         {
-            if (player.position.X < 0)
+            if (player.Position.X < 0)
             {
-                player.position.X += configuration.WorldWidth;
+                player.Position += new Vector2(configuration.WorldWidth, 0f);
             }
-            else if (player.position.X > configuration.WorldWidth)
+            else if (player.Position.X > configuration.WorldWidth)
             {
-                player.position.X -= configuration.WorldWidth;
+                player.Position -= new Vector2(configuration.WorldWidth, 0f);
             }
 
-            ViewPort = (player.position * new Vector2(1, 1)) - new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+            ViewPort = (player.Position * new Vector2(1, 1)) - new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
             ViewPort.Y = MathHelper.Clamp(ViewPort.Y, 0, configuration.WorldHeight - VIEWPORT_HEIGHT);
 
             foreach (var s in notDestroyedEnemys.Union(new AbstractEnemy[] { destroyer }))
             {
-                if (s.position.X < ViewPort.X - (configuration.WorldWidth >> 1))
+                if (s.Position.X < ViewPort.X - (configuration.WorldWidth >> 1))
                 {
-                    s.position.X += configuration.WorldWidth;
+                    s.Position += new Vector2(configuration.WorldWidth, 0f);
                 }
-                else if (s.position.X > ViewPort.X + (configuration.WorldWidth >> 1))
+                else if (s.Position.X > ViewPort.X + (configuration.WorldWidth >> 1))
                 {
-                    s.position.X -= configuration.WorldWidth;
+                    s.Position -= new Vector2(configuration.WorldWidth, 0f);
                 }
             }
 
-            if (player.bomb.position.X < ViewPort.X - (configuration.WorldWidth >> 1))
+            if (player.bomb.Position.X < ViewPort.X - (configuration.WorldWidth >> 1))
             {
-                player.bomb.position.X += configuration.WorldWidth;
+                player.bomb.Position += new Vector2(configuration.WorldWidth, 0f);
             }
-            else if (player.bomb.position.X > ViewPort.X + (configuration.WorldWidth >> 1))
+            else if (player.bomb.Position.X > ViewPort.X + (configuration.WorldWidth >> 1))
             {
-                player.bomb.position.X -= configuration.WorldWidth;
+                player.bomb.Position -= new Vector2(configuration.WorldWidth, 0f);
             }
 
             foreach (var s in player.allShots)
             {
 
-                if (s.position.X < ViewPort.X - (configuration.WorldWidth >> 1))
+                if (s.Position.X < ViewPort.X - (configuration.WorldWidth >> 1))
                 {
-                    s.position.X += configuration.WorldWidth;
+                    s.Position+= new Vector2(configuration.WorldWidth, 0f);
                 }
-                else if (s.position.X > ViewPort.X + (configuration.WorldWidth >> 1))
+                else if (s.Position.X > ViewPort.X + (configuration.WorldWidth >> 1))
                 {
-                    s.position.X -= configuration.WorldWidth;
+                    s.Position -= new Vector2(configuration.WorldWidth, 0f);
                 }
             }
 
             foreach (var s in allEnemyShots)
             {
 
-                if (s.position.X < ViewPort.X - (configuration.WorldWidth >> 1))
+                if (s.Position.X < ViewPort.X - (configuration.WorldWidth >> 1))
                 {
-                    s.position.X += configuration.WorldWidth;
+                    s.Position += new Vector2(configuration.WorldWidth, 0f);
 
 
                 }
-                else if (s.position.X > ViewPort.X + (configuration.WorldWidth >> 1))
+                else if (s.Position.X > ViewPort.X + (configuration.WorldWidth >> 1))
                 {
-                    s.position.X -= configuration.WorldWidth;
+                    s.Position -= new Vector2(configuration.WorldWidth, 0f);
 
 
                 }
@@ -302,15 +302,15 @@ namespace Resistance.Scene
             foreach (var s in notKilledHumans)
             {
 
-                if (s.position.X < ViewPort.X - (configuration.WorldWidth >> 1))
+                if (s.Position.X < ViewPort.X - (configuration.WorldWidth >> 1))
                 {
-                    s.position.X += configuration.WorldWidth;
+                    s.Position += new Vector2(configuration.WorldWidth, 0f);
 
 
                 }
-                else if (s.position.X > ViewPort.X + (configuration.WorldWidth >> 1))
+                else if (s.Position.X > ViewPort.X + (configuration.WorldWidth >> 1))
                 {
-                    s.position.X -= configuration.WorldWidth;
+                    s.Position -= new Vector2(configuration.WorldWidth, 0f);
 
 
                 }

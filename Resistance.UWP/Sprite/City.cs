@@ -12,21 +12,21 @@ namespace Resistance.Sprite
 {
     class City : IDrawableComponent
     {
-        static Vector2 originCity1;
-        static Vector2 originCity2;
-        static Vector2 originCity3;
+        private static Vector2 originCity1;
+        private static Vector2 originCity2;
+        private static Vector2 originCity3;
 
-        public float paralxSpeed;
-        public float scalewidth;
-        City lowerCity;
-        City higherCity;
+        public float ParalxSpeed { get; }
+        public float Scalewidth { get; }
+        private City lowerCity;
+        private City higherCity;
 
 
-        static Texture2D city1;
-        static Texture2D city2;
-        static Texture2D city3;
+        private static Texture2D city1;
+        private static Texture2D city2;
+        private static Texture2D city3;
 
-        static bool loaded;
+        private static bool loaded;
 
 
 
@@ -81,39 +81,21 @@ namespace Resistance.Sprite
             }
         }
 
-        public int DrawOrder
-        {
-            get;
-            set;
-        }
-
-        public event EventHandler<EventArgs> DrawOrderChanged;
-
-        public bool Visible
-        {
-            get;
-            set;
-        }
-
-        public event EventHandler<EventArgs> VisibleChanged;
 
 
-
-
-
+        public bool Visible { get; set; }
 
 
         public City(CityNumber image, float paralaxSpeed, GameScene scene)
         {
-            // TODO: Complete member initialization
             this.image = CityNumber.None;
-            this.paralxSpeed = paralaxSpeed;
+            this.ParalxSpeed = paralaxSpeed;
             this.scene = scene;
             lowerCity = new City(image, scene);
             higherCity = new City(image, scene);
-            scalewidth = ((paralxSpeed * (float)GameScene.VIEWPORT_WIDTH + scene.configuration.WorldWidth * 0.35f));
+            Scalewidth = ((ParalxSpeed * (float)GameScene.VIEWPORT_WIDTH + scene.configuration.WorldWidth * 0.35f));
 
-            OriginalPosition = new Vector2(Game1.random.Next((int)(scene.configuration.WorldWidth - scalewidth * 2)) + scalewidth + GameScene.VIEWPORT_WIDTH, scene.configuration.WorldHeight - 10f - (1 - paralxSpeed) * 10f);
+            OriginalPosition = new Vector2(Game1.random.Next((int)(scene.configuration.WorldWidth - Scalewidth * 2)) + Scalewidth + GameScene.VIEWPORT_WIDTH, scene.configuration.WorldHeight - 10f - (1 - ParalxSpeed) * 10f);
             Visible = true;
             lowerCity.Visible = true;
             higherCity.Visible = true;
@@ -121,8 +103,7 @@ namespace Resistance.Sprite
 
         public City(CityNumber image, GameScene scene)
         {
-            // TODO: Complete member initialization
-            OriginalPosition = new Vector2(Game1.random.Next((int)(scene.configuration.WorldWidth - scalewidth)), scene.configuration.WorldHeight - 10f - (1 - paralxSpeed) * 70f);
+            OriginalPosition = new Vector2(Game1.random.Next((int)(scene.configuration.WorldWidth - Scalewidth)), scene.configuration.WorldHeight - 10f - (1 - ParalxSpeed) * 70f);
             this.image = image;
             this.scene = scene;
         }
@@ -155,7 +136,7 @@ namespace Resistance.Sprite
 
 
 
-        Vector2 position;
+        private Vector2 position;
         private CityNumber image;
         private int p;
         private GameScene scene;
@@ -173,8 +154,8 @@ namespace Resistance.Sprite
                 position = value;
                 if (lowerCity != null && higherCity != null)
                 {
-                    lowerCity.Position = new Vector2(position.X - scalewidth, position.Y);
-                    higherCity.Position = new Vector2(position.X + scalewidth, position.Y);
+                    lowerCity.Position = new Vector2(position.X - Scalewidth, position.Y);
+                    higherCity.Position = new Vector2(position.X + Scalewidth, position.Y);
                 }
             }
         }

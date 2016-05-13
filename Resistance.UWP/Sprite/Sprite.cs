@@ -11,82 +11,80 @@ using Resistance.UWP;
 
 namespace Resistance.Sprite
 {
+
+    public enum Direction
+    {
+        None,
+        Left,
+        Right
+
+    }
+
+    public abstract class CollidelbleSprite : Sprite
+    {
+        private Rectangle collisionRec;
+
+        public CollidelbleSprite(string imageName, GameScene scene, Rectangle collisionRec) : base(imageName, scene)
+        {
+            this.collisionRec = collisionRec;
+        }
+
+        public bool ColideWith(CollidelbleSprite other)
+        {
+            var t = collisionRec;
+            t.Offset((int)Position.X, (int)Position.Y);
+            var o = other.collisionRec;
+            o.Offset((int)other.Position.X, (int)other.Position.Y);
+            return t.Intersects(o);
+        }
+    }
+
     public abstract class Sprite : IDrawableComponent
     {
 
 
-        public abstract Texture2D Image
+        private Animation currentAnimation;
+        private double frameTime;
+        private String imageName;
+        public Sprite(String imageName, GameScene scene)
         {
-            get;
-            set;
+            this.imageName = imageName;
+            this.Scene = scene;
         }
 
-
-        public Vector2 position;
-
-        public Vector2 origion;
-
-        public Rectangle collisonRec;
-
-        public GameScene scene;
-
-        private String imageName;
-
-        private Animation currentAnimation;
-
+        public Color Color { get; set; } = Color.White;
         public Animation CurrentAnimation
         {
             get { return currentAnimation; }
             set
             {
                 currentAnimation = value;
-                AnimationChanged();
+                if (currentAnimation != null)
+                    this.Origin = currentAnimation.CalculateOriginForAnimation();
+                else
+                    this.Origin = Vector2.Zero;
             }
         }
 
-        protected virtual void AnimationChanged()
-        {
-            origion = new Vector2(currentAnimation.frameWidth / 2, currentAnimation.frameHeight / 2);
-        }
-
-        public int currentAnimationFrame;
-
-        public SpriteEffects spriteEfekt = SpriteEffects.None;
+        public int CurrentAnimationFrame { get; set; }
+        public abstract Texture2D Image { get; set; }
 
 
-        public Sprite(String imageName, GameScene scene)
-        {
-            this.imageName = imageName;
-            this.scene = scene;
-            color = Color.White;
-        }
+        public Vector2 Origin { get; private set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Scale { get; set; } = Vector2.One;
+        public GameScene Scene { get; }
+        public SpriteEffects SpriteEfekt { get; set; } = SpriteEffects.None;
+
+        public bool Visible { get; set; }
 
         public virtual void Draw(GameTime gameTime)
         {
+            if (CurrentAnimation == null)
+                Visible = false;
             if (Visible)
-                Game1.instance.spriteBatch.Draw(Image, position - scene.ViewPort, CurrentAnimation[currentAnimationFrame], color, 0f, origion, scale, spriteEfekt, 0f);
-
+                Game1.instance.spriteBatch.Draw(Image, Position - Scene.ViewPort, CurrentAnimation[CurrentAnimationFrame], Color, 0f, Origin, Scale, SpriteEfekt, 0f);
         }
-
-        public int DrawOrder
-        {
-            get;
-            set;
-        }
-
-        public event EventHandler<EventArgs> DrawOrderChanged;
-
-        public bool Visible
-        {
-            get;
-            set;
-        }
-
-        public event EventHandler<EventArgs> VisibleChanged;
-        public Vector2 scale = Vector2.One;
-        public Color color;
-
-        public abstract void Update(GameTime gameTime);
 
         public virtual void Initilize()
         {
@@ -95,114 +93,89 @@ namespace Resistance.Sprite
                 Game1.instance.QueuLoadContent(imageName, (Texture2D t) => Image = t);
         }
 
-        public bool ColideWith(Sprite other)
+        public virtual void Update(GameTime gameTime)
         {
-            var t = collisonRec;
-            t.Offset((int)position.X, (int)position.Y);
-            var o = other.collisonRec;
-            o.Offset((int)other.position.X, (int)other.position.Y);
-            return t.Intersects(o);
-        }
-
-        public struct Animation
-        {
-            public Point leftTop;
-            public int width;
-            public int height;
-            public int frameWidth;
-            public int frameHeight;
-
-
-
-
-            public Animation(Point leftTop, int width, int heigth, int frameWidth, int frameHeighr)
+            if (CurrentAnimation != null && Visible)
             {
-                this.leftTop = leftTop;
-                this.width = width;
-                this.height = heigth;
-                this.frameWidth = frameWidth;
-                this.frameHeight = frameHeighr;
-
-            }
-            public int Length { get { return width * height; } }
-
-            public Rectangle this[int index]
-            {
-                get { return new Rectangle(leftTop.X + (index % width) * frameWidth, leftTop.Y + (index / width) * frameHeight, frameWidth, frameHeight); }
-            }
-
-            public static bool operator ==(Animation a1, Animation a2)
-            {
-                return a1.Equals(a2);
-            }
-
-            public static bool operator !=(Animation a1, Animation a2)
-            {
-                return !a1.Equals(a2);
-            }
-
-            // override object.Equals
-            public override bool Equals(object obj)
-            {
-                //       
-                // See the full list of guidelines at
-                //   http://go.microsoft.com/fwlink/?LinkID=85237  
-                // and also the guidance for operator== at
-                //   http://go.microsoft.com/fwlink/?LinkId=85238
-                //
-
-                if (obj == null || GetType() != obj.GetType())
+                frameTime += gameTime.ElapsedGameTime.TotalSeconds;
+                while (frameTime > CurrentAnimation.AnimationSpeed)
                 {
-                    return false;
-                }
+                    var epleapsedFrames = (int)Math.Floor(frameTime / CurrentAnimation.AnimationSpeed);
+                    CurrentAnimationFrame += epleapsedFrames;
+                    if (CurrentAnimationFrame >= CurrentAnimation.Length)
+                    {
+                        var lastAnimationFrames = epleapsedFrames - (CurrentAnimationFrame - CurrentAnimation.Length);
+                        frameTime -= lastAnimationFrames * CurrentAnimation.AnimationSpeed;
 
-                if (Object.ReferenceEquals(this, obj))
-                    return true;
-                if (obj == null)
-                    return false;
-                Animation other = (Animation)obj;
-                if (frameHeight != other.frameHeight)
-                    return false;
-                if (frameWidth != other.frameWidth)
-                    return false;
-                if (height != other.height)
-                    return false;
-                if (leftTop == null)
-                {
-                    if (other.leftTop != null)
-                        return false;
+                        epleapsedFrames -= lastAnimationFrames;
+                        CurrentAnimation = CurrentAnimation.NextAnimation;
+                        if (CurrentAnimation == null)
+                            break;
+                        CurrentAnimationFrame = 0;
+                    }
+                    else
+                        frameTime -= epleapsedFrames * CurrentAnimation.AnimationSpeed;
                 }
-                else if (!leftTop.Equals(other.leftTop))
-                    return false;
-                if (width != other.width)
-                    return false;
-                return true;
-            }
-
-            // override object.GetHashCode
-            public override int GetHashCode()
-            {
-                int prime = 31;
-                int result = 1;
-                result = prime * result + frameHeight;
-                result = prime * result + frameWidth;
-                result = prime * result + height;
-                result = prime * result + leftTop.GetHashCode();
-                result = prime * result + width;
-                return result;
             }
 
         }
 
 
 
-    }
 
-    public enum Direction
-    {
-        None,
-        Left,
-        Right
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CS0660", Justification = "Provided by Fody")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CS0661", Justification = "Provided by Fody")]
+        public class Animation
+        {
+            private Func<Animation, Vector2> calculateOrigin;
+            private int? frameCount;
+
+            public Animation(Point leftTop, int width, int heigth, int frameWidth, int frameHeighr, double animationSpeed, Func<Animation, Vector2> calculateOrigin = null, Animation nextAnimation = null, bool loop = true)
+            {
+                this.LeftTop = leftTop;
+                this.Width = width;
+                this.Height = heigth;
+                this.FrameWidth = frameWidth;
+                this.FrameHeight = frameHeighr;
+                this.AnimationSpeed = animationSpeed;
+                this.NextAnimation = nextAnimation ?? (loop ? this : null);
+                this.calculateOrigin = calculateOrigin ?? new Func<Animation, Vector2>(animation => new Vector2(animation.FrameWidth / 2, animation.FrameHeight / 2));
+
+            }
+
+            public Animation(Point leftTop, int width, int heigth, int frameWidth, int frameHeighr, double animationSpeed, Func<Vector2> calculateOrigin, Animation nextAnimation = null, bool loop = true) : this(leftTop, width, heigth, frameWidth, frameHeighr, animationSpeed, animation => calculateOrigin(), nextAnimation, loop)
+            { }
+
+            public Animation(Point leftTop, int width, int heigth, int frameCount, int frameWidth, int frameHeighr, double animationSpeed, Func<Vector2> calculateOrigin, Animation nextAnimation = null, bool loop = true) : this(leftTop, width, heigth, frameWidth, frameHeighr, animationSpeed, animation => calculateOrigin(), nextAnimation, loop)
+            { this.frameCount = frameCount; }
+
+
+            public Animation NextAnimation { get; }
+
+            public double AnimationSpeed { get; }
+            public int FrameHeight { get; }
+            public int FrameWidth { get; }
+            public int Height { get; }
+            public Point LeftTop { get; }
+            public int Length => frameCount ?? Width * Height;
+            public int Width { get; }
+
+
+            public Rectangle this[int index] =>
+                new Rectangle(
+                    LeftTop.X + (index % Width) * FrameWidth,
+                    LeftTop.Y + (index / Width) * FrameHeight,
+                    FrameWidth,
+                    FrameHeight);
+
+
+            public Vector2 CalculateOriginForAnimation() => calculateOrigin(this);
+
+
+
+        }
+
+
 
     }
 }

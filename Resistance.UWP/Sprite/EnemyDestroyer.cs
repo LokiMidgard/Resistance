@@ -22,7 +22,7 @@ namespace Resistance.Sprite
 
 
 
-        public static readonly Animation FLY = new Animation(Point.Zero, 3, 3, 32, 32);
+        public static readonly Animation FLY = new Animation(Point.Zero, 3, 3,8, 32, 32, 0.05f, () => new Vector2(16, 16));
 
 
         /**
@@ -129,16 +129,14 @@ namespace Resistance.Sprite
 
         private const int MAX_NUMBER_OF_SHOTS = 36;
 
-        double frameTime;
-        const double animationSpeed = 0.05f;
+
 
         public EnemyDestroyer(GameScene scene)
-            : base(@"Animation\Enemy4", scene)
+            : base(@"Animation\Enemy4", scene, new Rectangle(-15, -15, -32, 32))
         {
             Dead = true;
             CurrentAnimation = FLY;
-            collisonRec = new Rectangle(-15, -15, -32, 32);
-            origion = new Vector2(16, 16);
+
             shots = new EnemyPredator.Shot[MAX_NUMBER_OF_SHOTS];
             for (int i = 0; i < MAX_NUMBER_OF_SHOTS; i++)
             {
@@ -155,7 +153,7 @@ namespace Resistance.Sprite
             for (int i = 0; i < MAX_NUMBER_OF_SHOTS; i++)
             {
                 shots[i].Initilize();
-                scene.allEnemyShots.Add(shots[i]);
+                Scene.allEnemyShots.Add(shots[i]);
 
             }
         }
@@ -176,39 +174,28 @@ namespace Resistance.Sprite
                 return;
             }
 
-            frameTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            while (frameTime > animationSpeed)
-            {
-                ++currentAnimationFrame;
-                if (currentAnimationFrame >= 8)
-                {
-                    currentAnimationFrame = 0;
-                }
-
-                frameTime -= animationSpeed;
-            }
             Vector2 movment = new Vector2();
 
 
-            if (position.Y < 0)
+            if (Position.Y < 0)
             {
                 movment = new Vector2(0, 1);
             }
-            else if (position.Y > scene.configuration.WorldHeight - CurrentAnimation.frameHeight - 5)
+            else if (Position.Y > Scene.configuration.WorldHeight - CurrentAnimation.FrameHeight - 5)
             {
                 movment = new Vector2(0, -1);
             }
-            Debug.Assert(!float.IsNaN(position.Y));
+            Debug.Assert(!float.IsNaN(Position.Y));
             if (aktuellerTic > MAX_TIME_TO_LIVE)
             {
                 movment = new Vector2(0, -1);
-                if (position.Y < -100 || float.IsNaN(position.Y))
+                if (Position.Y < -100 || float.IsNaN(Position.Y))
                 {
                     this.Destroy(true);
                 }
 
-                position += movment * scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Position += movment * Scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 return;
             }
             //        if (getY() > 0 && (getX() - StaticFields.currentLevel.getPlayer().getX()) * (getX() - StaticFields.currentLevel.getPlayer().getX()) + (getY() - StaticFields.currentLevel.getPlayer().getY()) * (getY() - StaticFields.currentLevel.getPlayer().getY()) < 500 * 500) {
@@ -217,31 +204,31 @@ namespace Resistance.Sprite
 
 
 
-            Player player = scene.player;
+            Player player = Scene.player;
 
             Vector2 playerMovement = player.movment;
             if (playerMovement != Vector2.Zero)
                 playerMovement.Normalize();
             else
                 playerMovement = new Vector2(0, -1);
-            Vector2 targetPosition = player.position + playerMovement * 180;
+            Vector2 targetPosition = player.Position + playerMovement * 180;
 
 
 
-            Vector2 movmentDirection = targetPosition - position;
+            Vector2 movmentDirection = targetPosition - Position;
 
-            if (movmentDirection.Length() > scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds)
+            if (movmentDirection.Length() > Scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds)
             {
                 movmentDirection.Normalize();
                 movment += movmentDirection;
-                position += movment * scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Position += movment * Scene.configuration.Destroyer.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
             else
             {
-                position = targetPosition;
+                Position = targetPosition;
             }
 
-            if ((position - targetPosition).LengthSquared() < 800)
+            if ((Position - targetPosition).LengthSquared() < 800)
             {
                 fire();
             }
@@ -266,7 +253,7 @@ namespace Resistance.Sprite
             indicis.Remove(index);
             EnemyPredator.Shot s = shots[index];
 
-            s.init(position, movment, 3.0);
+            s.init(Position, movment, 3.0);
             lastShotNumber++;
 
             //TODO Make sound;
@@ -283,12 +270,12 @@ namespace Resistance.Sprite
         public override void Destroy()
         {
             livePoints--;
-            scene.score += 10;
+            Scene.score += 10;
             if (livePoints > 0)
             {
                 return;
             }
-            scene.score += 150;
+            Scene.score += 150;
 
             base.Destroy();
         }
@@ -308,10 +295,9 @@ namespace Resistance.Sprite
                 Visible = true;
                 livePoints = EnemyDestroyer.MAX_LIVEPOINTS;
                 aktuellerTic = 0;
-                collisonRec = new Rectangle(-16, -16, 32, 32);
                 CurrentAnimation = FLY;
-                origion = new Vector2(16, 16);
-                position = new Vector2(Game1.random.Next(scene.configuration.WorldWidth), Game1.random.Next(300) - 400);
+
+                Position = new Vector2(Game1.random.Next(Scene.configuration.WorldWidth), Game1.random.Next(300) - 400);
             }
 
         }

@@ -40,19 +40,17 @@ namespace Resistance.Sprite
 
 
 
-        double frameTime;
-        const double animationSpeed = 0.05f;
+
+
         const float SPEED = 16;
 
 
 
-        private static readonly Animation FLY = new Animation(Point.Zero, 3, 3, 32, 32);
+        private static readonly Animation FLY = new Animation(Point.Zero, 3, 3, 7,32, 32, 0.05, () => new Vector2(16, 16));
 
         public EnemyPredator(GameScene scene)
-            : base(@"Animation\Enemy1", scene)
+            : base(@"Animation\Enemy1", scene, new Rectangle(-16, -16, 32, 32))
         {
-            origion = new Microsoft.Xna.Framework.Vector2(16, 16);
-            collisonRec = new Rectangle(-16, -16, 32, 32);
             CurrentAnimation = FLY;
             shots = new Shot[scene.configuration.Predator.NumberOfShots];
             for (int i = 0; i < scene.configuration.Predator.NumberOfShots; i++)
@@ -70,11 +68,10 @@ namespace Resistance.Sprite
             Game1.instance.QueuLoadContent(@"Sound\shot", (SoundEffect t) => zap = t);
 
             CurrentAnimation = FLY;
-            origion = new Vector2(16, 16);
 
 
 
-            for (int i = 0; i < scene.configuration.Predator.NumberOfShots; i++)
+            for (int i = 0; i < Scene.configuration.Predator.NumberOfShots; i++)
             {
                 shots[i].Initilize();
             }
@@ -103,28 +100,17 @@ namespace Resistance.Sprite
             }
 
 
-            frameTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            while (frameTime > animationSpeed)
-            {
-                ++currentAnimationFrame;
-                if (currentAnimationFrame >= 7)
-                {
-                    currentAnimationFrame = 0;
-                }
-
-                frameTime -= animationSpeed;
-            }
             int newDirection = Game1.random.Next(512);
             if (newDirection < 8)
             {
                 direction = newDirection;
             }
-            if (position.Y < 0)
+            if (Position.Y < 0)
             {
                 direction = RUNTER;
             }
-            else if (position.Y > scene.configuration.WorldHeight - CurrentAnimation.frameHeight - 5)
+            else if (Position.Y > Scene.configuration.WorldHeight - CurrentAnimation.FrameHeight - 5)
             {
                 direction = HOCH;
             }
@@ -158,9 +144,9 @@ namespace Resistance.Sprite
 
             }
 
-            position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
+            Position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
 
-            if (Game1.random.Next((3 - (int)scene.difficulty) << 5) < 1)
+            if (Game1.random.Next((3 - (int)Scene.difficulty) << 5) < 1)
             {
                 fire();
             }
@@ -175,9 +161,9 @@ namespace Resistance.Sprite
 
             Vector2 target;
 
-            Player player = scene.player;
+            Player player = Scene.player;
 
-            if (scene.configuration.EnemyTargetting)
+            if (Scene.configuration.EnemyTargetting)
             {
                 for (float i = 0; i < 6f; i += 0.3f)
                 {
@@ -185,10 +171,10 @@ namespace Resistance.Sprite
 
                     var mov = player.movment;
 
-                    var newPlayerPosition = player.position + (i * mov);
+                    var newPlayerPosition = player.Position + (i * mov);
 
-                    target = newPlayerPosition - position;
-                    if (target.LengthSquared() <= scene.configuration.EnemyShotSpeed * i * scene.configuration.EnemyShotSpeed * i)
+                    target = newPlayerPosition - Position;
+                    if (target.LengthSquared() <= Scene.configuration.EnemyShotSpeed * i * Scene.configuration.EnemyShotSpeed * i)
                         goto targetin;
 
                 }
@@ -196,14 +182,14 @@ namespace Resistance.Sprite
 
             }
             else
-                target = player.position - position;
+                target = player.Position - Position;
             if (target.LengthSquared() > 400 * 400)
             {
                 return;
 
 
             }
-        targetin:
+            targetin:
 
             float distance = target.Length();
 
@@ -220,8 +206,8 @@ namespace Resistance.Sprite
             Shot s = shots[index];
 
             target.Normalize();
-            target *= scene.configuration.EnemyShotSpeed;
-            s.init(position, target, distance + 150);
+            target *= Scene.configuration.EnemyShotSpeed;
+            s.init(Position, target, distance + 150);
             zap.Play();
             //TODO: Shoot
             //((Shot) shots.pop()).init(getRefPixelX(), getRefPixelY(), dx, dy, distance + 150);
@@ -229,7 +215,7 @@ namespace Resistance.Sprite
 
         }
 
-        public class Shot : Sprite
+        public class Shot : CollidelbleSprite
         {
 
             private static Microsoft.Xna.Framework.Graphics.Texture2D image;
@@ -240,10 +226,8 @@ namespace Resistance.Sprite
                 set { image = value; }
             }
 
-            public static readonly Animation FLY = new Animation(Point.Zero, 2, 2, 8, 8);
+            public static readonly Animation FLY = new Animation(Point.Zero, 2, 2, 8, 8, 0.05f);
 
-            double frameTime;
-            const double animationSpeed = 0.05f;
 
             double livetime = 0;
             /**
@@ -259,7 +243,7 @@ namespace Resistance.Sprite
             }
 
             public Shot(GameScene scene)
-                : base(@"Animation\newAlienFireBlast", scene)
+                : base(@"Animation\newAlienFireBlast", scene, new Rectangle(-4, -4, 8, 8))
             {
                 CurrentAnimation = FLY;
             }
@@ -269,9 +253,9 @@ namespace Resistance.Sprite
                 timeToLive = lifetime;
                 this.livetime = 0;
 
-                this.position = position;
+                this.Position = position;
                 movement.Normalize();
-                movement *= scene.configuration.EnemyShotSpeed;
+                movement *= Scene.configuration.EnemyShotSpeed;
                 this.movment = movement;
 
                 Visible = true;
@@ -279,39 +263,31 @@ namespace Resistance.Sprite
 
             public override void Update(GameTime gameTime)
             {
+                base.Update(gameTime);
+
                 if (!Visible)
                     return;
-                if ((position.Y < 0 && movment.Y <= 0) || (position.Y > scene.configuration.WorldHeight && movment.Y >= 0))
+                if ((Position.Y < 0 && movment.Y <= 0) || (Position.Y > Scene.configuration.WorldHeight && movment.Y >= 0))
                 {
-                    die();
+                    Die();
                 }
                 livetime += gameTime.ElapsedGameTime.TotalSeconds;
                 if (livetime > timeToLive)
                 {
-                    die();
+                    Die();
                 }
-                else if (ColideWith(scene.player))
+                else if (ColideWith(Scene.player))
                 {
-                    scene.player.Hit();
-                    die();
+                    Scene.player.Hit();
+                    Die();
                 }
                 else
                 {
-                    while (frameTime > animationSpeed)
-                    {
-                        ++currentAnimationFrame;
-                        if (currentAnimationFrame > CurrentAnimation.Length)
-                        {
-                            currentAnimationFrame = 0;
-                        }
-
-                        frameTime -= animationSpeed;
-                    }
-                    position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    Position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
             }
 
-            private void die()
+            private void Die()
             {
                 Visible = false;
 
@@ -320,7 +296,7 @@ namespace Resistance.Sprite
 
         public override void Destroy()
         {
-            scene.score += 75;
+            Scene.score += 75;
             base.Destroy();
         }
 

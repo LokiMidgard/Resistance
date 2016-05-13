@@ -19,14 +19,12 @@ namespace Resistance.Sprite
             set { image = value; }
         }
 
-        public static readonly Animation FLY = new Animation(Point.Zero, 2, 2, 32, 32);
+        public static readonly Animation FLY = new Animation(Point.Zero, 2, 2, 32, 32, 0.05f, () => new Vector2(16, 32));
 
         public EnemyCollector(GameScene scene)
-            : base(@"Animation\Enemy2", scene)
+            : base(@"Animation\Enemy2", scene, new Rectangle(-16, -32, 32, 32))
         {
             CurrentAnimation = FLY;
-            origion = new Vector2(16, 32);
-            collisonRec = new Rectangle(-16, -32, 32, 32);
         }
 
 
@@ -36,16 +34,6 @@ namespace Resistance.Sprite
             base.Initilize();
             target = null;
             CurrentAnimation = FLY;
-
-
-        }
-
-        double frameTime;
-        const double animationSpeed = 0.05f;
-
-        protected override void AnimationChanged()
-        {
-            origion = new Vector2(CurrentAnimation.frameWidth / 2, CurrentAnimation.frameHeight);
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
@@ -68,7 +56,7 @@ namespace Resistance.Sprite
             {
                 movement += new Vector2(0, -1);
 
-                if (position.Y < -50)
+                if (Position.Y < -50)
                 {
                     target.Die();
                     target = null;
@@ -81,7 +69,7 @@ namespace Resistance.Sprite
             }
             else
             {
-                var sqrDistance = (position - target.position).LengthSquared();
+                var sqrDistance = (Position - target.Position).LengthSquared();
                 if (sqrDistance <= 16)
                 {
 
@@ -90,36 +78,25 @@ namespace Resistance.Sprite
                 else
                 {
 
-                    var direction = (target.position - position);
+                    var direction = (target.Position - Position);
 
                     direction.Normalize();
                     movement += direction;
                 }
             }
 
-            position += movement * scene.configuration.Collector.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position += movement * Scene.configuration.Collector.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
 
-            frameTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            while (frameTime > animationSpeed)
-            {
-                ++currentAnimationFrame;
-                if (currentAnimationFrame >= CurrentAnimation.Length)
-                {
-                    currentAnimationFrame = 0;
-                }
-
-                frameTime -= animationSpeed;
-            }
 
         }
 
         private void searchTarget()
         {
-            var v = scene.notKilledHumans;
+            var v = Scene.notKilledHumans;
 
-            var newV = (from x in v where !x.IsCaptured orderby (position - x.position).LengthSquared() select x);
+            var newV = (from x in v where !x.IsCaptured orderby (Position - x.Position).LengthSquared() select x);
             target = newV.FirstOrDefault();
 
         }
@@ -131,7 +108,7 @@ namespace Resistance.Sprite
             {
                 target.isCapturedBy = null;
             }
-            scene.score += 75;
+            Scene.score += 75;
             base.Destroy();
         }
 

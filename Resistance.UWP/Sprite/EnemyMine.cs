@@ -19,11 +19,9 @@ namespace Resistance.Sprite
             set { image = value; }
         }
 
-        public static readonly Animation FLY = new Animation(Point.Zero, 3, 3, 32, 32);
+        public static readonly Animation FLY = new Animation(Point.Zero, 3, 3,8, 32, 32, 0.05f, () => new Vector2(16, 16));
 
 
-        double frameTime;
-        const double animationSpeed = 0.05f;
 
 
         private int direction;
@@ -37,49 +35,32 @@ namespace Resistance.Sprite
         private const int DIRECTION_DOWN_RIGHT = 7;
 
         public EnemyMine(GameScene scene)
-            : base(@"Animation\Enemy3", scene)
+            : base(@"Animation\Enemy3", scene, new Rectangle(-16, -16, 32, 32))
         {
-            collisonRec = new Rectangle(-16, -16, 32, 32);
         }
 
         public override void Initilize()
         {
             base.Initilize();
             CurrentAnimation = FLY;
-            origion = new Vector2(16, 16);
-
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
             base.Update(gameTime);
             if (Dead)
-            {
                 return;
-            }
-
-            frameTime += gameTime.ElapsedGameTime.TotalSeconds;
-
-            while (frameTime > animationSpeed)
-            {
-                ++currentAnimationFrame;
-                if (currentAnimationFrame >= 8)
-                {
-                    currentAnimationFrame = 0;
-                }
-
-                frameTime -= animationSpeed;
-            }
 
 
-            Player player = scene.player;
+
+            Player player = Scene.player;
 
             Vector2 movment = new Vector2();
 
-            if ((player.position - position).LengthSquared() < 350 * 350)
+            if ((player.Position - Position).LengthSquared() < 350 * 350)
             {
                 // Spieler rammen
-                Vector2 target = player.position - position;
+                Vector2 target = player.Position - Position;
                 target.Normalize();
                 movment += target;
 
@@ -92,11 +73,11 @@ namespace Resistance.Sprite
                 {
                     direction = newDirection;
                 }
-                if (position.Y < 0)
+                if (Position.Y < 0)
                 {
                     direction = DIRECTION_DOWN;
                 }
-                else if (position.Y > scene.configuration.WorldHeight - 32 - 5)
+                else if (Position.Y > Scene.configuration.WorldHeight - 32 - 5)
                 {
                     direction = DIRECTION_UP;
                 }
@@ -130,7 +111,7 @@ namespace Resistance.Sprite
                 movment.Normalize();
             }
 
-            position += movment * scene.configuration.Mine.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position += movment * Scene.configuration.Mine.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (ColideWith(player))
             {
@@ -144,7 +125,7 @@ namespace Resistance.Sprite
 
         public override void Destroy()
         {
-            scene.score += 75;
+            Scene.score += 75;
             base.Destroy();
         }
 

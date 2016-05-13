@@ -13,14 +13,14 @@ using Microsoft.Xna.Framework.Audio;
 namespace Resistance.Sprite
 {
 
-    public class Player : Sprite
+    public class Player : CollidelbleSprite
     {
 
-        const double animationSpeed = 0.05f;
-        public static readonly Animation FLY_Left = new Animation(new Point(0, 3 * 24), 1, 1, 48, 24);
-        public static readonly Animation FLY_RIGHT = new Animation(Point.Zero, 1, 1, 48, 24);
-        public static readonly Animation TURN_LEFT = new Animation(Point.Zero, 6, 3, 48, 24);
-        public static readonly Animation TURN_RIGHT = new Animation(new Point(0, 3 * 24), 6, 3, 48, 24);
+
+        public static readonly Animation FLY_Left = new Animation(new Point(0, 3 * 24), 1, 1, 48, 24, 0.05f);
+        public static readonly Animation FLY_RIGHT = new Animation(Point.Zero, 1, 1, 48, 24, 0.05f);
+        public static readonly Animation TURN_LEFT = new Animation(Point.Zero, 6, 3, 48, 24, 0.05f, nextAnimation: FLY_Left);
+        public static readonly Animation TURN_RIGHT = new Animation(new Point(0, 3 * 24), 6, 3, 48, 24, 0.05f, nextAnimation: FLY_RIGHT);
         SoundEffect shoot;
 
         System.Collections.Generic.Dictionary<int, bool> indicis = new Dictionary<int, bool>();
@@ -40,12 +40,12 @@ namespace Resistance.Sprite
 
 
         public Player(GameScene scene)
-            : base(@"Animation\SmallShipTiles", scene)
+            : base(@"Animation\SmallShipTiles", scene, new Rectangle(-24, -12, 48, 24))
         {
             bomb = new Bomb(scene);
-            position = new Vector2(scene.configuration.WorldWidth / 2, scene.configuration.WorldHeight / 2);
-            origion = new Vector2(24, 12);
-            collisonRec = new Rectangle(-24, -12, 48, 24);
+            Position = new Vector2(scene.configuration.WorldWidth / 2, scene.configuration.WorldHeight / 2);
+
+
             allShots = new Shot[scene.configuration.Player.ShotCount];
 
             for (int i = 0; i < allShots.Length; i++)
@@ -72,7 +72,7 @@ namespace Resistance.Sprite
             int i = indicis.First().Key;
             indicis.Remove(i);
             Shot s = allShots[i];
-            s.Fire(speed, CurrentAnimation == FLY_Left ? Direction.Left : Direction.Right, position);
+            s.Fire(speed, CurrentAnimation == FLY_Left ? Direction.Left : Direction.Right, Position);
             shoot.Play();
         }
 
@@ -80,7 +80,7 @@ namespace Resistance.Sprite
         {
             --lifePoints;
             if (lifePoints <= 0)
-                scene.GameOver();
+                Scene.GameOver();
         }
 
         public override void Initilize()
@@ -88,7 +88,7 @@ namespace Resistance.Sprite
             base.Initilize();
             CurrentAnimation = FLY_RIGHT;
             bomb.Initilize();
-            lifePoints = scene.configuration.Player.Lifepoints;
+            lifePoints = Scene.configuration.Player.Lifepoints;
 
             Game1.instance.QueuLoadContent(@"Sound\shot2", (SoundEffect s) => shoot = s);
 
@@ -100,36 +100,11 @@ namespace Resistance.Sprite
 
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
-
-            var input = scene.input;
+            base.Update(gameTime);
+            var input = Scene.input;
             bomb.Update(gameTime);
             frameTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            while (frameTime > animationSpeed)
-            {
-
-                if (CurrentAnimation == TURN_LEFT)
-                {
-                    ++currentAnimationFrame;
-                    if (currentAnimationFrame >= CurrentAnimation.Length)
-                    {
-                        CurrentAnimation = FLY_Left;
-                        currentAnimationFrame = 0;
-                    }
-
-                }
-                else if (CurrentAnimation == TURN_RIGHT)
-                {
-                    ++currentAnimationFrame;
-                    if (currentAnimationFrame >= CurrentAnimation.Length)
-                    {
-                        CurrentAnimation = FLY_RIGHT;
-                        currentAnimationFrame = 0;
-                    }
-                }
-
-                frameTime -= animationSpeed;
-            }
 
             movment = new Vector2();
 
@@ -153,7 +128,7 @@ namespace Resistance.Sprite
                 else if (input.Right == AbstractInput.Type.Press)
                     CurrentAnimation = TURN_RIGHT;
             }
-            movment *= scene.configuration.Player.Speed;
+            movment *= Scene.configuration.Player.Speed;
             if (input.Fire == AbstractInput.Type.Press && CurrentAnimation != TURN_LEFT && CurrentAnimation != TURN_RIGHT)
             {
                 Fire(movment.X);
@@ -162,7 +137,7 @@ namespace Resistance.Sprite
             {
                 bomb.Boom();
             }
-            position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position += movment * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             for (int i = 0; i < allShots.Length; i++)
             {
@@ -199,22 +174,20 @@ namespace Resistance.Sprite
             public Bomb(GameScene scene)
                 : base(@"Animation\BombExplosion", scene)
             {
-                CurrentAnimation = new Animation(Point.Zero, 1, 1, 475, 474);
+                CurrentAnimation = new Animation(Point.Zero, 1, 1, 475, 474, float.MaxValue);
+
+                destructivRangeWithScaleOne = new Vector2(CurrentAnimation.FrameWidth / 2, CurrentAnimation.FrameHeight / 2);
+                scaleWithMaxRadius = new Vector2(Scene.configuration.Player.MaxBombSizeWidth / destructivRangeWithScaleOne.X, Scene.configuration.Player.MaxBombSizeHeight / destructivRangeWithScaleOne.Y);
+                scalePerSeccond = scaleWithMaxRadius / Scene.configuration.Player.TimeTillMaxBombSize;
             }
 
-            protected override void AnimationChanged()
-            {
-                base.AnimationChanged();
-                destructivRangeWithScaleOne = new Vector2(CurrentAnimation.frameWidth / 2, CurrentAnimation.frameHeight / 2);
-                scaleWithMaxRadius = new Vector2(scene.configuration.Player.MaxBombSizeWidth / destructivRangeWithScaleOne.X, scene.configuration.Player.MaxBombSizeHeight / destructivRangeWithScaleOne.Y);
-                scalePerSeccond = scaleWithMaxRadius / scene.configuration.Player.TimeTillMaxBombSize;
-            }
+
 
             public void Boom()
             {
-                position = scene.player.position;
+                Position = Scene.player.Position;
                 Visible = true;
-                scale = Vector2.Zero;
+                Scale = Vector2.Zero;
             }
 
             public override void Initilize()
@@ -225,9 +198,9 @@ namespace Resistance.Sprite
 
             public bool PointWithinExplosion(Vector2 pointposition)
             {
-                Vector2 realativPosition = pointposition - position;
+                Vector2 realativPosition = pointposition - Position;
 
-                Vector2 radians = destructivRangeWithScaleOne * scale;
+                Vector2 radians = destructivRangeWithScaleOne * Scale;
 
                 if (radians.X != radians.Y)
                     realativPosition *= new Vector2(1, radians.X / radians.Y);
@@ -236,40 +209,53 @@ namespace Resistance.Sprite
 
             public override void Update(GameTime gameTime)
             {
+                base.Update(gameTime);
+
                 if (!Visible)
                     return;
-                if (scale.X >= scaleWithMaxRadius.X && scale.X >= scaleWithMaxRadius.X)
+                if (Scale.X >= scaleWithMaxRadius.X && Scale.X >= scaleWithMaxRadius.X)
                 {
                     Visible = false;
                     return;
                 }
 
-                float transparentPercent = 1f - scale.X / scaleWithMaxRadius.X;
+                float transparentPercent = 1f - Scale.X / scaleWithMaxRadius.X;
 
-                color = new Color(transparentPercent, transparentPercent, transparentPercent, transparentPercent);
+                Color = new Color(transparentPercent, transparentPercent, transparentPercent, transparentPercent);
 
-                foreach (var enemy in scene.notDestroyedEnemys)
+                foreach (var enemy in Scene.notDestroyedEnemys)
                 {
-                    if (PointWithinExplosion(enemy.position))
+                    if (PointWithinExplosion(enemy.Position))
                         enemy.Destroy();
                 }
 
 
-                scale += scalePerSeccond * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Scale += scalePerSeccond * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
         }
 
-        public class Shot : Sprite
+        public class Shot : CollidelbleSprite
         {
 
-            const double animationSpeed = 0.05f;
             public const double SHOT_LIFETIME = 2;
             public const float SPEED = 720;
-            private readonly Animation CREATE = new Animation(Point.Zero, 4, 2, 160, 8);
-            private readonly Animation DIE = new Animation(new Point(0, 8), 4, 2, 160, 8);
+            private static readonly Animation DIE_LEFT;
+            private static readonly Animation DIE_RIGHT;
+            private static readonly Animation FLY_LEFT;
+            private static readonly Animation FLY_RIGHT;
+            private static readonly Animation CREATE_LEFT;
+            private static readonly Animation CREATE_RIGHT;
             public Direction direction;
-            private readonly Animation FLY = new Animation(new Point(0, 8), 1, 1, 160, 8);
-            double frameTime;
+
+            static Shot()
+            {
+                Shot.DIE_LEFT  = new Animation(new Point(0, 8), 4, 2, 160, 8, 0.05f, () => new Vector2(2, 4), loop: false);
+                Shot.DIE_RIGHT = new Animation(new Point(0, 8), 4, 2, 160, 8, 0.05f, () => new Vector2(158, 4), loop: false);
+                Shot.FLY_LEFT  = new Animation(new Point(0, 8), 1, 1, 160, 8, 0.05f, () => new Vector2(2, 4));
+                Shot.FLY_RIGHT = new Animation(new Point(0, 8), 1, 1, 160, 8, 0.05f, () => new Vector2(158, 4));
+                Shot.CREATE_LEFT  = new Animation(Point.Zero, 4, 2,5, 160, 8, 0.05f, () => new Vector2(2, 4), Shot.FLY_LEFT);
+                Shot.CREATE_RIGHT = new Animation(Point.Zero, 4, 2, 5,160, 8, 0.05f, () => new Vector2(158, 4), Shot.FLY_RIGHT);
+            }
 
             private static Microsoft.Xna.Framework.Graphics.Texture2D image;
             public override Microsoft.Xna.Framework.Graphics.Texture2D Image
@@ -283,22 +269,27 @@ namespace Resistance.Sprite
             public float speed;
 
             public Shot(Player player)
-                : base(@"Animation\FireBlastTiles", player.scene)
+                : base(@"Animation\FireBlastTiles", player.Scene, new Rectangle(-4, -2, 8, 4))
             {
                 this.player = player;
-                CurrentAnimation = FLY;
+
             }
 
-            protected override void AnimationChanged()
-            {
-                //Auskommentiert, da die Collision rectangls zu sehr mit der Grafik verknüpft sind
-                //base.AnimationChanged();
-            }
+
 
             private void Die()
             {
-                CurrentAnimation = DIE;
-                currentAnimationFrame = 0;
+                
+                switch (direction)
+                {
+                    case Direction.Left:
+                        CurrentAnimation = DIE_LEFT;
+                        break;
+                    case Direction.Right:
+                        CurrentAnimation = DIE_RIGHT;
+                        break;
+                }
+                CurrentAnimationFrame = 0;
             }
 
             public override void Draw(GameTime gameTime)
@@ -309,27 +300,24 @@ namespace Resistance.Sprite
 
             public void Fire(float playerSpeed, Direction playerDirection, Vector2 position)
             {
-                this.position = position;
+                this.Position = position;
                 this.direction = playerDirection;
-                switch (playerDirection)
+                switch (direction)
                 {
                     case Direction.Left:
                         speed = playerSpeed - SPEED;
-                        origion = new Vector2(0, 4);
-                        spriteEfekt = SpriteEffects.FlipHorizontally;
-                        collisonRec = new Rectangle(-2, -2, 8, 4);
+                        CurrentAnimation = CREATE_LEFT;
+                        SpriteEfekt = SpriteEffects.FlipHorizontally;
                         break;
                     case Direction.Right:
                         speed = playerSpeed + SPEED;
-                        origion = new Vector2(160, 4);
-                        collisonRec = new Rectangle(-6, -2, 8, 4);
-                        spriteEfekt = SpriteEffects.None;
+                        CurrentAnimation = CREATE_RIGHT;
+                        SpriteEfekt = SpriteEffects.None;
                         break;
                 }
                 Visible = true;
-                currentAnimationFrame = 0;
+                CurrentAnimationFrame = 0;
                 lifetime = 0;
-                CurrentAnimation = CREATE;
             }
 
             public override void Initilize()
@@ -340,69 +328,47 @@ namespace Resistance.Sprite
 
             public override void Update(GameTime gameTime)
             {
+                base.Update(gameTime);
                 if (!Visible)
                     return;
 
-                Vector2 tmp = player.position;
+                Vector2 tmp = player.Position;
 
-                position += new Vector2((float)(speed * gameTime.ElapsedGameTime.TotalSeconds), 0);
+                Position += new Vector2((float)(speed * gameTime.ElapsedGameTime.TotalSeconds), 0);
 
                 lifetime += gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (lifetime > SHOT_LIFETIME && CurrentAnimation != DIE)
+                if (lifetime > SHOT_LIFETIME && !(CurrentAnimation == DIE_LEFT || CurrentAnimation == DIE_RIGHT || CurrentAnimation == null))
                 {
                     Die();
                 }
 
-                frameTime += gameTime.ElapsedGameTime.TotalSeconds;
-
-                while (frameTime > animationSpeed)
-                {
-                    if (CurrentAnimation == CREATE)
-                    {
-                        ++currentAnimationFrame;
-                        if (currentAnimationFrame > 5)
-                        {
-                            currentAnimationFrame = 0;
-                            CurrentAnimation = FLY;
-                        }
-                    }
-                    else if (CurrentAnimation == DIE)
-                    {
-                        ++currentAnimationFrame;
-                        if (currentAnimationFrame > 6)
-                        {
-                            Visible = false;
-                        }
-
-                    }
 
 
-                    frameTime -= animationSpeed;
-                }
 
 
-                if (CurrentAnimation != DIE)
+
+                if (CurrentAnimation != DIE_LEFT && CurrentAnimation != DIE_RIGHT && CurrentAnimation != null)
                 {
 
-                    var enemys = player.scene.notDestroyedEnemys.Union(new AbstractEnemy[] { scene.destroyer });
+                    var enemys = player.Scene.notDestroyedEnemys.Union(new AbstractEnemy[] { Scene.destroyer });
                     foreach (var e in enemys)
                     {
                         if (ColideWith(e) && !e.Dead
-                            && ((direction == Direction.Right && e.position.X >= tmp.X)
-                                || (direction == Direction.Left && e.position.X <= tmp.X)))
+                            && ((direction == Direction.Right && e.Position.X >= tmp.X)
+                                || (direction == Direction.Left && e.Position.X <= tmp.X)))
                         {
                             e.Destroy();
                             Die();
                             break;
                         }
                     }
-                    var humans = player.scene.notKilledHumans;
+                    var humans = player.Scene.notKilledHumans;
                     foreach (var h in humans)
                     {
                         if (ColideWith(h)
-                            && ((direction == Direction.Right && h.position.X >= tmp.X)
-                                || (direction == Direction.Left && h.position.X <= tmp.X)))
+                            && ((direction == Direction.Right && h.Position.X >= tmp.X)
+                                || (direction == Direction.Left && h.Position.X <= tmp.X)))
                         {
                             h.Die();
                             Die();

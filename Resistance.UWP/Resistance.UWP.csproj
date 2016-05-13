@@ -8,7 +8,7 @@
     <ProjectGuid>{3FBF8176-14AA-4133-B6FF-6212274F2CA3}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Resistance.UWP</RootNamespace>
+    <RootNamespace>Resistance</RootNamespace>
     <AssemblyName>Resistance.UWP</AssemblyName>
     <DefaultLanguage>de-DE</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -104,6 +104,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\IComponent.cs" />
+    <Compile Include="Components\IDrawable.cs" />
     <Compile Include="Components\IDrawableComponent.cs" />
     <Compile Include="Configuration\IConfiguration.cs" />
     <Compile Include="GamePage.xaml.cs">
@@ -112,6 +113,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Input\AbstractInput.cs" />
     <Compile Include="Input\GameInput.cs" />
+    <Compile Include="Input\MenueInput.cs" />
     <Compile Include="LevelBackground\DesertBackground.cs" />
     <Compile Include="Loading\ContentLoader.cs" />
     <Compile Include="Loading\LoadedDelegate.cs" />
@@ -124,6 +126,7 @@
     <Compile Include="Scene\LoadingScene.cs" />
     <Compile Include="Scene\TitleScene.cs" />
     <Compile Include="Sprite\AbstractEnemy.cs" />
+    <Compile Include="Sprite\AnimatedMenueEntry.cs" />
     <Compile Include="Sprite\City.cs" />
     <Compile Include="Sprite\EnemyCollector.cs" />
     <Compile Include="Sprite\EnemyDestroyer.cs" />
@@ -156,6 +159,7 @@
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />
+    <Content Include="FodyWeavers.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\StoreLogo.png" />

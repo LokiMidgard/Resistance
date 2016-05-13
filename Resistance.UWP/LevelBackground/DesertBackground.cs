@@ -84,7 +84,7 @@ namespace Resistance.LevelBackground
 
                 var c = cytiys[i];
                 //c.Position = new Vector2((scene.ViewPort.X * c.paralxSpeed) + c.OriginalPosition.X, ((pre) * c.paralxSpeed) + c.OriginalPosition.Y);
-                c.Position = new Vector2((scene.ViewPort.X * c.paralxSpeed) + c.OriginalPosition.X, (float)((c.OriginalPosition.Y) - (pre * c.paralxSpeed)));
+                c.Position = new Vector2((scene.ViewPort.X * c.ParalxSpeed) + c.OriginalPosition.X, (float)((c.OriginalPosition.Y) - (pre * c.ParalxSpeed)));
 
 
             }
@@ -133,7 +133,7 @@ namespace Resistance.LevelBackground
             }
             Game1.instance.QueuLoadContent("gradient", (Texture2D t) => gradient = t);
             Game1.instance.QueuLoadContent("stars", (Texture2D t) => star = t);
-            cytiys = cytiys.OrderByDescending(c => c.paralxSpeed).ToArray();
+            cytiys = cytiys.OrderByDescending(c => c.ParalxSpeed).ToArray();
 
         }
 
